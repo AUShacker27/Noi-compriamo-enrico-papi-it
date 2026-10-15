@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Noi compriamo Enrico Papi .it</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            z-index: 5;
+        }
+        h1 {
+            color: #ffffff;
+            font-size: 28px;
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+        .btn-papi {
+            background-color: #ffcc00;
+            color: #000000;
+            font-size: 22px;
+            font-weight: bold;
+            padding: 20px 50px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(255, 204, 0, 0.4);
+            text-transform: uppercase;
+        }
+        /* Contenitore stile YouTube Shorts / TikTok */
+        .video-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            z-index: 10;
+            display: none;
+        }
+        /* Forza il formato verticale 9:16 centrale e blocca i clic */
+        video {
+            width: 100%;
+            height: 100%;
+            max-width: 100vh; /* Impedisce di allargarsi troppo su PC */
+            aspect-ratio: 9 / 16;
+            object-fit: cover; /* Taglia e riempie in verticale come TikTok */
+            margin: 0 auto;
+            display: block;
+            pointer-events: none; /* Rende il video completamente NON CLICCABILE (impossibile stopparlo) */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="mainInterface">
+        <h1>cosa vorrà mai Enrico papi?</h1>
+        <button class="btn-papi" id="playBtn">MOOSECA! 🎚</button>
+    </div>
+
+    <div class="video-wrapper" id="videoContainer">
+        <!-- Rimosso l'attributo controls per non mostrare la barra e i tasti di stop -->
+        <video id="papiVideo" loop playsinline webkit-playsinline muted>
+            <source src="papi" type="video/mp4">
+            <source src="papi.mp4" type="video/mp4">
+        </video>
+    </div>
+
+    <script>
+        const playBtn = document.getElementById('playBtn');
+        const mainInterface = document.getElementById('mainInterface');
+        const videoContainer = document.getElementById('videoContainer');
+        const papiVideo = document.getElementById('papiVideo');
+
+        playBtn.addEventListener('click', () => {
+            mainInterface.style.display = 'none';
+            videoContainer.style.display = 'block';
+            
+            papiVideo.muted = false;
+            papiVideo.volume = 1.0;
+            
+            const playPromise = papiVideo.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    papiVideo.muted = true;
+                    papiVideo.play().then(() => {
+                        setTimeout(() => { papiVideo.muted = false; }, 50);
+                    });
+                });
+            }
+
+            // Attiva la modalità tutto schermo del contenitore
+            if (videoContainer.requestFullscreen) {
+                videoContainer.requestFullscreen().catch(() => {});
+            } else if (videoContainer.webkitRequestFullscreen) {
+                videoContainer.webkitRequestFullscreen().catch(() => {});
+            } else if (papiVideo.webkitEnterFullscreen) {
+                papiVideo.webkitEnterFullscreen();
+            }
+        });
+    </script>
+</body>
+</html>
