@@ -2,143 +2,109 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Noi compriamo Enrico Papi .it</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enrico Papi Mystery</title>
     <style>
-        * {
-            box-sizing: border-box;
+        /* Sfondo completamente nero e centraggio assoluto */
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-        }
-        body, html {
-            width: 100%;
-            height: 100%;
-            background-color: #000000;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
-        .container {
+
+        /* Schermata iniziale con la domanda e il pulsante */
+        .quiz-container {
             text-align: center;
             padding: 20px;
-            z-index: 2;
-            transition: opacity 0.5s ease;
+            z-index: 10;
         }
+
         h1 {
-            color: #ffffff;
-            font-size: 28px;
-            margin-bottom: 40px;
-            font-weight: 700;
-            line-height: 1.4;
-            padding: 0 10px;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: bold;
+            letter-spacing: 1px;
         }
-        .btn-papi {
+
+        /* Il pulsante giallo richiesto */
+        .btn-giallo {
             background-color: #ffcc00;
             color: #000000;
-            font-size: 22px;
-            font-weight: bold;
-            padding: 20px 50px;
             border: none;
             border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 8px 25px rgba(255, 204, 0, 0.4);
+            padding: 15px 40px;
+            font-size: 1.3rem;
+            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: transform 0.1s ease, box-shadow 0.1s ease;
-            -webkit-tap-highlight-color: transparent;
+            cursor: pointer;
+            box-shadow: 0px 0px 20px rgba(255, 204, 0, 0.6);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .btn-papi:active {
-            transform: scale(0.95);
-            box-shadow: 0 4px 10px rgba(255, 204, 0, 0.2);
+
+        .btn-giallo:hover {
+            transform: scale(1.05);
+            box-shadow: 0px 0px 30px rgba(255, 204, 0, 0.9);
         }
-        .video-wrapper {
-            position: fixed;
+
+        /* Contenitore del video (nascosto all'inizio) */
+        .video-container {
+            display: none;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background-color: #000000;
-            z-index: 10;
-            display: none;
         }
-        video {
+
+        /* Stile verticale tipo Shorts/TikTok */
+        iframe {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            border: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="container" id="mainInterface">
-        <h1>Scopri cosa vuole Enrico Papi da te</h1>
-        <button class="btn-papi" id="playBtn">Scoprilo ora 🎬</button>
+    <!-- Schermata Principale -->
+    <div class="quiz-container" id="quizScreen">
+        <h1>Cosa vorrà mai Enrico papi?</h1>
+        <button class="btn-giallo" id="discoverBtn">Scoprilo</button>
     </div>
 
-    <div class="video-wrapper" id="videoContainer">
-        <!-- Aggiunti attributi di sblocco nativi per i telefoni -->
-        <video id="papiVideo" loop playsinline webkit-playsinline muted></video>
+    <!-- Schermata Video in Loop -->
+    <div class="video-container" id="videoScreen">
+        <!-- Video di noi compriamo auto.it con Enrico Papi impostato in autoplay e loop infinito -->
+        <iframe id="papiVideo" src="" allow="autoplay; encrypted-media"></iframe>
     </div>
 
     <script>
-        const playBtn = document.getElementById('playBtn');
-        const mainInterface = document.getElementById('mainInterface');
-        const videoContainer = document.getElementById('videoContainer');
+        const quizScreen = document.getElementById('quizScreen');
+        const videoScreen = document.getElementById('videoScreen');
+        const discoverBtn = document.getElementById('discoverBtn');
         const papiVideo = document.getElementById('papiVideo');
 
-        const videoSources = ['papi', 'papi.mp4', 'papi.MP4', 'papi.mov', 'papi.MOV'];
-        let currentSourceIndex = 0;
+        // ID del video Short/TikTok ufficiale di Enrico Papi
+        const videoId = "v_m_WAnYWeU"; 
 
-        function tryLoadVideo() {
-            if (currentSourceIndex < videoSources.length) {
-                papiVideo.src = videoSources[currentSourceIndex];
-                papiVideo.load();
-            }
-        }
-
-        papiVideo.addEventListener('error', () => {
-            currentSourceIndex++;
-            tryLoadVideo();
-        });
-
-        tryLoadVideo();
-
-        playBtn.addEventListener('click', () => {
-            mainInterface.style.opacity = '0';
-            setTimeout(() => {
-                mainInterface.style.display = 'none';
-                videoContainer.style.display = 'block';
-                
-                // Trucco per sbloccare l'audio sui telefoni Android/iOS
-                papiVideo.muted = false;
-                papiVideo.volume = 1.0;
-                
-                // Tenta la riproduzione forzata
-                const playPromise = papiVideo.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log("Il browser richiede un secondo tocco:", error);
-                        // Se fallisce ancora, riprova forzando il muto e riattivando l'audio subito dopo
-                        papiVideo.muted = true;
-                        papiVideo.play().then(() => {
-                            setTimeout(() => { papiVideo.muted = false; }, 50);
-                        });
-                    });
-                }
-
-                // Schermo intero automatico
-                if (papiVideo.requestFullscreen) {
-                    papiVideo.requestFullscreen().catch(() => {});
-                } else if (papiVideo.webkitRequestFullscreen) {
-                    papiVideo.webkitRequestFullscreen().catch(() => {});
-                } else if (papiVideo.webkitEnterFullscreen) {
-                    papiVideo.webkitEnterFullscreen();
-                }
-                
-            }, 500);
+        discoverBtn.addEventListener('click', () => {
+            // Nasconde la domanda e il pulsante giallo
+            quizScreen.style.display = 'none';
+            
+            // Mostra lo schermo del video a tutto schermo
+            videoScreen.style.display = 'block';
+            
+            // Avvia il video in formato verticale a schermo intero con autoplay e loop continuo
+            papiVideo.src = `https://youtube.com{videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&mute=0`;
         });
     </script>
 </body>
