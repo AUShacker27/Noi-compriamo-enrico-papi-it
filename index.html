@@ -14,24 +14,25 @@
             width: 100%;
             height: 100%;
             background-color: #000000;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            -webkit-user-select: none;
-            user-select: none;
         }
         .container {
             text-align: center;
             padding: 20px;
-            z-index: 5;
+            z-index: 2;
+            transition: opacity 0.5s ease;
         }
         h1 {
             color: #ffffff;
             font-size: 28px;
             margin-bottom: 40px;
-            font-weight: bold;
+            font-weight: 700;
+            line-height: 1.4;
+            padding: 0 10px;
         }
         .btn-papi {
             background-color: #ffcc00;
@@ -44,8 +45,14 @@
             cursor: pointer;
             box-shadow: 0 8px 25px rgba(255, 204, 0, 0.4);
             text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            -webkit-tap-highlight-color: transparent;
         }
-        /* Contenitore stile YouTube Shorts / TikTok */
+        .btn-papi:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 10px rgba(255, 204, 0, 0.2);
+        }
         .video-wrapper {
             position: fixed;
             top: 0;
@@ -56,32 +63,23 @@
             z-index: 10;
             display: none;
         }
-        /* Forza il formato verticale 9:16 centrale e blocca i clic */
         video {
             width: 100%;
             height: 100%;
-            max-width: 100vh; /* Impedisce di allargarsi troppo su PC */
-            aspect-ratio: 9 / 16;
-            object-fit: cover; /* Taglia e riempie in verticale come TikTok */
-            margin: 0 auto;
-            display: block;
-            pointer-events: none; /* Rende il video completamente NON CLICCABILE (impossibile stopparlo) */
+            object-fit: contain;
         }
     </style>
 </head>
 <body>
 
     <div class="container" id="mainInterface">
-        <h1>cosa vorrà mai Enrico papi?</h1>
-        <button class="btn-papi" id="playBtn">MOOSECA! 🎚</button>
+        <h1>Scopri cosa vuole Enrico Papi da te</h1>
+        <button class="btn-papi" id="playBtn">Scoprilo ora 🎬</button>
     </div>
 
     <div class="video-wrapper" id="videoContainer">
-        <!-- Rimosso l'attributo controls per non mostrare la barra e i tasti di stop -->
-        <video id="papiVideo" loop playsinline webkit-playsinline muted>
-            <source src="papi" type="video/mp4">
-            <source src="papi.mp4" type="video/mp4">
-        </video>
+        <!-- Aggiunti attributi di sblocco nativi per i telefoni -->
+        <video id="papiVideo" loop playsinline webkit-playsinline muted></video>
     </div>
 
     <script>
@@ -90,31 +88,57 @@
         const videoContainer = document.getElementById('videoContainer');
         const papiVideo = document.getElementById('papiVideo');
 
-        playBtn.addEventListener('click', () => {
-            mainInterface.style.display = 'none';
-            videoContainer.style.display = 'block';
-            
-            papiVideo.muted = false;
-            papiVideo.volume = 1.0;
-            
-            const playPromise = papiVideo.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(() => {
-                    papiVideo.muted = true;
-                    papiVideo.play().then(() => {
-                        setTimeout(() => { papiVideo.muted = false; }, 50);
-                    });
-                });
-            }
+        const videoSources = ['papi', 'papi.mp4', 'papi.MP4', 'papi.mov', 'papi.MOV'];
+        let currentSourceIndex = 0;
 
-            // Attiva la modalità tutto schermo del contenitore
-            if (videoContainer.requestFullscreen) {
-                videoContainer.requestFullscreen().catch(() => {});
-            } else if (videoContainer.webkitRequestFullscreen) {
-                videoContainer.webkitRequestFullscreen().catch(() => {});
-            } else if (papiVideo.webkitEnterFullscreen) {
-                papiVideo.webkitEnterFullscreen();
+        function tryLoadVideo() {
+            if (currentSourceIndex < videoSources.length) {
+                papiVideo.src = videoSources[currentSourceIndex];
+                papiVideo.load();
             }
+        }
+
+        papiVideo.addEventListener('error', () => {
+            currentSourceIndex++;
+            tryLoadVideo();
+        });
+
+        tryLoadVideo();
+
+        playBtn.addEventListener('click', () => {
+            mainInterface.style.opacity = '0';
+            setTimeout(() => {
+                mainInterface.style.display = 'none';
+                videoContainer.style.display = 'block';
+                
+                // Trucco per sbloccare l'audio sui telefoni Android/iOS
+                papiVideo.muted = false;
+                papiVideo.volume = 1.0;
+                
+                // Tenta la riproduzione forzata
+                const playPromise = papiVideo.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("Il browser richiede un secondo tocco:", error);
+                        // Se fallisce ancora, riprova forzando il muto e riattivando l'audio subito dopo
+                        papiVideo.muted = true;
+                        papiVideo.play().then(() => {
+                            setTimeout(() => { papiVideo.muted = false; }, 50);
+                        });
+                    });
+                }
+
+                // Schermo intero automatico
+                if (papiVideo.requestFullscreen) {
+                    papiVideo.requestFullscreen().catch(() => {});
+                } else if (papiVideo.webkitRequestFullscreen) {
+                    papiVideo.webkitRequestFullscreen().catch(() => {});
+                } else if (papiVideo.webkitEnterFullscreen) {
+                    papiVideo.webkitEnterFullscreen();
+                }
+                
+            }, 500);
         });
     </script>
 </body>
