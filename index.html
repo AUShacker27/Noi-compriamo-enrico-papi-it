@@ -65,11 +65,11 @@
             background-color: #000000;
         }
 
-        /* Stile verticale tipo Shorts/TikTok */
-        iframe {
+        /* Stile verticale tipo TikTok/Shorts per il video locale */
+        video {
             width: 100%;
             height: 100%;
-            border: none;
+            object-fit: cover;
         }
     </style>
 </head>
@@ -83,8 +83,11 @@
 
     <!-- Schermata Video in Loop -->
     <div class="video-container" id="videoScreen">
-        <!-- Video di noi compriamo auto.it con Enrico Papi impostato in autoplay e loop infinito -->
-        <iframe id="papiVideo" src="" allow="autoplay; encrypted-media"></iframe>
+        <!-- Motore sbloccato per riprodurre il tuo file video offline in loop continuo -->
+        <video id="papiVideo" loop playsinline>
+            <source src="video.mp4" type="video/mp4">
+            Il tuo browser non supporta questo video.
+        </video>
     </div>
 
     <script>
@@ -93,9 +96,6 @@
         const discoverBtn = document.getElementById('discoverBtn');
         const papiVideo = document.getElementById('papiVideo');
 
-        // ID del video Short/TikTok ufficiale di Enrico Papi
-        const videoId = "v_m_WAnYWeU"; 
-
         discoverBtn.addEventListener('click', () => {
             // Nasconde la domanda e il pulsante giallo
             quizScreen.style.display = 'none';
@@ -103,8 +103,13 @@
             // Mostra lo schermo del video a tutto schermo
             videoScreen.style.display = 'block';
             
-            // Avvia il video in formato verticale a schermo intero con autoplay e loop continuo
-            papiVideo.src = `https://youtube.com{videoId}?autoplay=1&loop=1&playlist=${videoId}&controls=0&mute=0`;
+            // Avvia la riproduzione del tuo file offline
+            papiVideo.play().catch(error => {
+                console.log("Autoplay con audio bloccato, riprovo in modalità muto:", error);
+                // Soluzione automatica se lo smartphone richiede il muto all'avvio improvviso
+                papiVideo.muted = true;
+                papiVideo.play();
+            });
         });
     </script>
 </body>
