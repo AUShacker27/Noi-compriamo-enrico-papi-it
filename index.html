@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enrico Papi Mystery</title>
     <style>
-        /* Sfondo completamente nero e centraggio assoluto */
         body {
             background-color: #000000;
             color: #ffffff;
@@ -20,7 +19,6 @@
             overflow: hidden;
         }
 
-        /* Schermata iniziale con la domanda e il pulsante */
         .quiz-container {
             text-align: center;
             padding: 20px;
@@ -31,10 +29,8 @@
             font-size: 2rem;
             margin-bottom: 30px;
             font-weight: bold;
-            letter-spacing: 1px;
         }
 
-        /* Il pulsante giallo richiesto */
         .btn-giallo {
             background-color: #ffcc00;
             color: #000000;
@@ -46,15 +42,8 @@
             text-transform: uppercase;
             cursor: pointer;
             box-shadow: 0px 0px 20px rgba(255, 204, 0, 0.6);
-            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .btn-giallo:hover {
-            transform: scale(1.05);
-            box-shadow: 0px 0px 30px rgba(255, 204, 0, 0.9);
-        }
-
-        /* Contenitore del video (nascosto all'inizio) */
         .video-container {
             display: none;
             position: absolute;
@@ -65,7 +54,6 @@
             background-color: #000000;
         }
 
-        /* Stile verticale tipo TikTok/Shorts per il video locale */
         video {
             width: 100%;
             height: 100%;
@@ -75,17 +63,16 @@
 </head>
 <body>
 
-    <!-- Schermata Principale -->
+    <!-- Schermata Principale con la tua frase -->
     <div class="quiz-container" id="quizScreen">
         <h1>Cosa vorrà mai Enrico papi?</h1>
         <button class="btn-giallo" id="discoverBtn">Scoprilo</button>
     </div>
 
-    <!-- Schermata Video in Loop -->
+    <!-- Schermata Video Locale in Loop -->
     <div class="video-container" id="videoScreen">
-        <!-- Motore sbloccato per riprodurre il tuo file video offline in loop continuo -->
-        <video id="papiVideo" loop playsinline>
-            <source src="video.mp4" type="video/mp4">
+        <video id="papiVideo" loop playsinline autoplay muted>
+            <source src="Video.mp4" type="video/mp4">
             Il tuo browser non supporta questo video.
         </video>
     </div>
@@ -97,19 +84,19 @@
         const papiVideo = document.getElementById('papiVideo');
 
         discoverBtn.addEventListener('click', () => {
-            // Nasconde la domanda e il pulsante giallo
+            // 1. Nasconde la scritta e il tasto giallo
             quizScreen.style.display = 'none';
             
-            // Mostra lo schermo del video a tutto schermo
+            // 2. Mostra lo schermo del video
             videoScreen.style.display = 'block';
             
-            // Avvia la riproduzione del tuo file offline
-            papiVideo.play().catch(error => {
-                console.log("Autoplay con audio bloccato, riprovo in modalità muto:", error);
-                // Soluzione automatica se lo smartphone richiede il muto all'avvio improvviso
-                papiVideo.muted = true;
-                papiVideo.play();
-            });
+            // 3. TRUCCO PER L'AUDIO: Togliamo il muto e alziamo il volume al massimo al click!
+            papiVideo.muted = false;
+            papiVideo.volume = 1.0;
+            
+            // Fà ripartire il video da zero per sicurezza con l'audio attivo
+            papiVideo.currentTime = 0;
+            papiVideo.play().catch(err => console.log("Errore audio:", err));
         });
     </script>
 </body>
